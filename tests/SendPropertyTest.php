@@ -2,9 +2,12 @@
 
 namespace mehmetbulut\Zoopla\Tests;
 
+use mehmetbulut\Zoopla\Exception\ZooplaValidationException;
 use mehmetbulut\Zoopla\Groups\Content;
 use mehmetbulut\Zoopla\Groups\Description;
+use mehmetbulut\Zoopla\Groups\GroundRent;
 use mehmetbulut\Zoopla\Request\SendProperty;
+use mehmetbulut\Zoopla\Values\Accessibility;
 use mehmetbulut\Zoopla\Values\AreaUnit;
 use mehmetbulut\Zoopla\Values\BillsIncluded;
 use mehmetbulut\Zoopla\Values\BuyerIncentives;
@@ -62,12 +65,12 @@ class SendPropertyTest extends TestCase
 
 		$request->property_type = PropertyType::BarnConversion; //enum
 		$request->listed_building_grade = ListedBuildingGrade::CategoryA; //enum
-		$request->tenure = Tenure::Leasehold; //enum
+//		$request->tenure = Tenure::Leasehold; //oneOf object
 
 		//number
 		$request->annual_business_rates = 432;
 		$request->deposit = 432;
-		$request->ground_rent = 432;
+		$request->ground_rent = new GroundRent(432);
 
 		//date
 		$request->available_from_date = date('Y-m-d');
@@ -78,7 +81,7 @@ class SendPropertyTest extends TestCase
 		$request->buyer_incentives = [BuyerIncentives::HelpToNuy, BuyerIncentives::NewBuy];
 		$request->central_heating = CentralHeating::Full;
 		$request->commercial_use_classes = [CommercialUseClass::A1];
-		$request->council_tax_band = CouncilTaxBand::A;
+//		$request->council_tax_band = CouncilTaxBand::A; //TODO: defined inside local_authority
 		$request->decorative_condition = DecorativeCondition::Average;
 		$request->feature_list = ["test", "test2"];
 		//$request->floor_levels = [FloorLevels::Basement,1];
@@ -88,7 +91,20 @@ class SendPropertyTest extends TestCase
 
 		//boolean
 		$request->fishing_rights = false;
-		$request->accessibility = true;
+		$request->accessibility = [
+			Accessibility::WheelchairAccessible,
+			Accessibility::StepFreeAccess,
+			Accessibility::WetRoom,
+			Accessibility::LateralLiving,
+			Accessibility::DisabledFeatures,
+			Accessibility::LevelAccess,
+			Accessibility::RampedAccess,
+			Accessibility::LiftAccess,
+			Accessibility::StairLift,
+			Accessibility::WideDorrways,
+			Accessibility::LevelAccessShower,
+			Accessibility::VariableHeightKitchenSurfaces,
+		];
 		$request->shared_accommodation = true;
 		$request->basement = true;
 		$request->burglar_alarm = true;
@@ -175,8 +191,9 @@ class SendPropertyTest extends TestCase
 		$request->google_street_view->heading = 2.32321;
 		$request->google_street_view->pitch = 2.32321;
 
+		// TODO: moved inside tenure >> leasehold object
 		//$request->lease_expiry->expiry_date = date('Y-m-d', strtotime('+ 10 day'));
-		$request->lease_expiry->years_remaining = 2000;
+//		$request->lease_expiry->years_remaining = 2000;
 
 		$request->content = [
 			new Content('https://www.talkwalker.com/images/2020/blog-headers/image-analysis.png', ContentType::Image, 'test'),
@@ -189,7 +206,13 @@ class SendPropertyTest extends TestCase
 		$this->assertJson($request->getJson());
 		$this->assertNotEmpty($request->getJson());
 
-		$request->validate();
+		try {
+			$request->validate();
+		} catch (ZooplaValidationException $e) {
+			echo '<pre>'; print_r($e->getErrors()); echo '</pre>';
+
+			$this->fail();
+		}
 
 		//$d = $c->send($request,true,null,false);
 	}

@@ -6,12 +6,14 @@ use mehmetbulut\Zoopla\Groups\Areas;
 use mehmetbulut\Zoopla\Groups\Content;
 use mehmetbulut\Zoopla\Groups\EpcRating;
 use mehmetbulut\Zoopla\Groups\GoogleStreetView;
+use mehmetbulut\Zoopla\Groups\GroundRent;
 use mehmetbulut\Zoopla\Groups\LeaseExpiry;
 use mehmetbulut\Zoopla\Groups\Location;
 use mehmetbulut\Zoopla\Groups\MinimumContractLength;
 use mehmetbulut\Zoopla\Groups\Pricing;
 use mehmetbulut\Zoopla\Groups\ServiceCharge;
 use mehmetbulut\Zoopla\Groups\TenantEligibility;
+use mehmetbulut\Zoopla\Values\Accessibility;
 use mehmetbulut\Zoopla\Values\BillsIncluded;
 use mehmetbulut\Zoopla\Values\BuyerIncentives;
 use mehmetbulut\Zoopla\Values\Category;
@@ -32,7 +34,7 @@ class SendProperty extends RequestBase
 {
 	protected $path = '/listing/update';
 
-	protected $schema = 'https://realtime-listings.webservices.zpg.co.uk/docs/v1.2/schemas/listing/update.json';
+	protected $schema = 'https://realtime-listings.webservices.zpg.co.uk/docs/v2.3/schemas/listing/update.json';
 
 	protected $schemaJsonFileName = 'send-property.json';
 
@@ -50,7 +52,6 @@ class SendProperty extends RequestBase
 		'service_charge' => array('type' => 'object', 'class' => ServiceCharge::class, ),
 		'epc_ratings' => array('type' => 'object', 'class' => EpcRating::class, ),
 		'google_street_view' => array('type' => 'object', 'class' => GoogleStreetView::class, ),
-		'lease_expiry' => array('type' => 'object', 'class' => LeaseExpiry::class, ),
 
 		'available_bedrooms' => array('type' => 'integer', ),
 		'bathrooms' => array('type' => 'integer', ),
@@ -62,7 +63,7 @@ class SendProperty extends RequestBase
 
 		'property_type' => array('type' => 'string', ),
 		'listed_building_grade' => array('type' => 'enum', 'class' => ListedBuildingGrade::class, ),
-		'tenure' => array('type' => 'enum', 'class' => Tenure::class, ),
+		'tenure' => array('type' => 'object', 'class' => Tenure::class, ),
 		'central_heating' => array('type' => 'enum', 'class' => CentralHeating::class, ),
 		'decorative_condition' => array('type' => 'enum', 'class' => DecorativeCondition::class, ),
 		'category' => array('type' => 'enum', 'class' => Category::class, ),
@@ -76,7 +77,7 @@ class SendProperty extends RequestBase
 
 		'annual_business_rates' => array('type' => 'number', ),
 		'deposit' => array('type' => 'number', ),
-		'ground_rent' => array('type' => 'number', ),
+		'ground_rent' => array('type' => 'object', 'class' => GroundRent::class),
 
 		'available_from_date' => array('type' => 'date', ),
 		'open_day' => array('type' => 'date', ),
@@ -97,7 +98,7 @@ class SendProperty extends RequestBase
 		'feature_list' => array('type' => 'array', ),
 
 		'fishing_rights' => array('type' => 'boolean', ),
-		'accessibility' => array('type' => 'boolean', ),
+		'accessibility' => array('type' => 'array', 'class' => Accessibility::class, ),
 		'shared_accommodation' => array('type' => 'boolean', ),
 		'basement' => array('type' => 'boolean', ),
 		'burglar_alarm' => array('type' => 'boolean', ),
